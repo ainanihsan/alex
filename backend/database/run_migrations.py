@@ -116,7 +116,7 @@ statements = [
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()""",
 ]
 
-print("🚀 Running database migrations...")
+print("Running database migrations...")
 print("=" * 50)
 
 success_count = 0
@@ -145,25 +145,25 @@ for i, stmt in enumerate(statements, 1):
         response = client.execute_statement(
             resourceArn=cluster_arn, secretArn=secret_arn, database=database, sql=stmt
         )
-        print(f"    ✅ Success")
+        print(f"    [OK] Success")
         success_count += 1
 
     except ClientError as e:
         error_msg = e.response["Error"]["Message"]
         if "already exists" in error_msg.lower():
-            print(f"    ⚠️  Already exists (skipping)")
+            print(f"    [SKIP] Already exists (skipping)")
             success_count += 1
         else:
-            print(f"    ❌ Error: {error_msg[:100]}")
+            print(f"    [ERROR] Error: {error_msg[:100]}")
             error_count += 1
 
 print("\n" + "=" * 50)
 print(f"Migration complete: {success_count} successful, {error_count} errors")
 
 if error_count == 0:
-    print("\n✅ All migrations completed successfully!")
-    print("\n📝 Next steps:")
+    print("\n[SUCCESS] All migrations completed successfully!")
+    print("\nNext steps:")
     print("1. Load seed data: uv run seed_data.py")
     print("2. Test database operations: uv run test_db.py")
 else:
-    print(f"\n⚠️  Some statements failed. Check errors above.")
+    print(f"\n[WARNING] Some statements failed. Check errors above.")
