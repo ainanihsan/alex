@@ -31,7 +31,7 @@ def taint_and_deploy_via_terraform() -> bool:
     # Change to terraform directory
     terraform_dir = Path(__file__).parent.parent / "terraform" / "6_agents"
     if not terraform_dir.exists():
-        print(f"❌ Terraform directory not found: {terraform_dir}")
+        print(f"[ERROR] Terraform directory not found: {terraform_dir}")
         return False
     
     # Lambda function names to taint
@@ -53,12 +53,12 @@ def taint_and_deploy_via_terraform() -> bool:
         if result.returncode == 0 or "already" in result.stderr:
             print(f"      ✓ {func} marked for recreation")
         elif "No such resource instance" in result.stderr:
-            print(f"      ⚠️ {func} doesn't exist (will be created)")
+            print(f"      [WARNING] {func} doesn't exist (will be created)")
         else:
-            print(f"      ⚠️ Warning: {result.stderr[:100]}")
+            print(f"      [WARNING] Warning: {result.stderr[:100]}")
     
     print()
-    print("🚀 Step 2: Running terraform apply...")
+    print("[LAUNCH] Step 2: Running terraform apply...")
     print("-" * 50)
     
     # Run terraform apply
@@ -71,11 +71,11 @@ def taint_and_deploy_via_terraform() -> bool:
     
     if result.returncode == 0:
         print()
-        print("✅ Terraform deployment completed successfully!")
+        print("[OK] Terraform deployment completed successfully!")
         return True
     else:
         print()
-        print("❌ Terraform deployment failed!")
+        print("[ERROR] Terraform deployment failed!")
         return False
 
 def package_lambda(service_name: str, service_dir: Path) -> bool:
@@ -89,7 +89,7 @@ def package_lambda(service_name: str, service_dir: Path) -> bool:
     Returns:
         True if successful, False otherwise
     """
-    print(f"   📦 Packaging {service_name}...")
+    print(f"   [PACKAGE] Packaging {service_name}...")
     
     package_script = service_dir / 'package_docker.py'
     if not package_script.exists():
@@ -128,7 +128,7 @@ def main():
     # Check for --package flag
     force_package = '--package' in sys.argv
     
-    print("🎯 Deploying Alex Agent Lambda Functions (via Terraform)")
+    print("[TARGET] Deploying Alex Agent Lambda Functions (via Terraform)")
     print("=" * 50)
     
     # Get AWS account ID
@@ -139,7 +139,7 @@ def main():
         print(f"AWS Account: {account_id}")
         print(f"AWS Region: {region}")
     except Exception as e:
-        print(f"❌ Failed to get AWS account info: {e}")
+        print(f"[ERROR] Failed to get AWS account info: {e}")
         print("   Make sure your AWS credentials are configured")
         sys.exit(1)
     
@@ -176,7 +176,7 @@ def main():
     # Package missing or all services if requested
     if services_to_package:
         print()
-        print("📦 Packaging Lambda functions...")
+        print("[PACKAGE] Packaging Lambda functions...")
         failed_packages = []
         
         for service_name, service_dir in services_to_package:
@@ -185,7 +185,7 @@ def main():
         
         if failed_packages:
             print()
-            print(f"❌ Failed to package: {', '.join(failed_packages)}")
+            print(f"[ERROR] Failed to package: {', '.join(failed_packages)}")
             print("   Make sure Docker is running and package_docker.py exists")
             response = input("Continue anyway? (y/N): ")
             if response.lower() != 'y':
@@ -198,7 +198,7 @@ def main():
         print()
         print("🎉 All Lambda functions deployed successfully!")
         print()
-        print("⚠️  IMPORTANT: Lambda functions were FORCE RECREATED")
+        print("[WARNING]  IMPORTANT: Lambda functions were FORCE RECREATED")
         print("   This ensures your latest code is running in AWS")
         print()
         print("Next steps:")
@@ -208,7 +208,7 @@ def main():
         sys.exit(0)
     else:
         print()
-        print("❌ Deployment failed!")
+        print("[ERROR] Deployment failed!")
         print()
         print("💡 Troubleshooting tips:")
         print("   1. Check terraform output for errors")

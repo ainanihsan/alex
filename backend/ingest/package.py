@@ -77,11 +77,11 @@ def create_deployment_package():
     
     # Get file size
     size_mb = zip_path.stat().st_size / (1024 * 1024)
-    print(f"\n✅ Deployment package created: {zip_path}")
+    print(f"\n[OK] Deployment package created: {zip_path}")
     print(f"   Size: {size_mb:.2f} MB")
     
     if size_mb > 50:
-        print("⚠️  Warning: Package exceeds 50MB. Consider using Lambda Layers.")
+        print("[WARNING]  Warning: Package exceeds 50MB. Consider using Lambda Layers.")
     
     return str(zip_path)
 

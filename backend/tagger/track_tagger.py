@@ -44,9 +44,9 @@ class TaggerLogTracker:
 
         except Exception as e:
             if 'ResourceNotFoundException' in str(e):
-                print(f"⚠️  Log group {self.log_group_name} not found")
+                print(f"[WARNING]  Log group {self.log_group_name} not found")
             else:
-                print(f"❌ Error fetching logs: {e}")
+                print(f"[ERROR] Error fetching logs: {e}")
             return []
 
     def format_log_message(self, event):
@@ -86,10 +86,10 @@ class TaggerLogTracker:
                 request_id = parts[0].split(' ')[2]
                 duration = parts[1] if len(parts) > 1 else ""
                 memory = parts[3] if len(parts) > 3 else ""
-                return f"{time_str} 📊 {color}Lambda Report: {duration}, {memory}{reset}"
+                return f"{time_str} [DATA] {color}Lambda Report: {duration}, {memory}{reset}"
         elif 'START RequestId' in message:
             request_id = message.split(' ')[2]
-            return f"{time_str} 🚀 {color}Lambda Start: {request_id[:8]}...{reset}"
+            return f"{time_str} [LAUNCH] {color}Lambda Start: {request_id[:8]}...{reset}"
         elif 'END RequestId' in message:
             request_id = message.split(' ')[2]
             return f"{time_str} 🏁 {color}Lambda End: {request_id[:8]}...{reset}"
@@ -99,7 +99,7 @@ class TaggerLogTracker:
             if len(parts) >= 3:
                 level = parts[0].strip('[]')
                 msg = parts[2] if len(parts) > 2 else parts[1]
-                level_icon = {'INFO': 'ℹ️ ', 'ERROR': '❌', 'WARNING': '⚠️ '}.get(level, '  ')
+                level_icon = {'INFO': 'ℹ️ ', 'ERROR': '[ERROR]', 'WARNING': '[WARNING] '}.get(level, '  ')
                 return f"{time_str} {level_icon} {color}{msg}{reset}"
         elif 'OpenAI Agents trace' in message:
             return f"{time_str} 🤖 {color}{message}{reset}"
@@ -159,16 +159,16 @@ class TaggerLogTracker:
             except KeyboardInterrupt:
                 break
             except Exception as e:
-                print(f"❌ Error in tracking loop: {e}")
+                print(f"[ERROR] Error in tracking loop: {e}")
                 time.sleep(5)
 
-        print("\n✅ Log tracking stopped")
+        print("\n[OK] Log tracking stopped")
 
 def main():
     """Main entry point"""
     tracker = TaggerLogTracker()
 
-    print("\n🔍 Looking for recent Langfuse-related logs...")
+    print("\n[CHECK] Looking for recent Langfuse-related logs...")
     print("-" * 40)
 
     # First show any recent Langfuse logs

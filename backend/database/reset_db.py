@@ -29,16 +29,16 @@ def drop_all_tables(db: DataAPIClient):
     for table in tables_to_drop:
         try:
             db.execute(f"DROP TABLE IF EXISTS {table} CASCADE")
-            print(f"   ✅ Dropped {table}")
+            print(f"   [OK] Dropped {table}")
         except Exception as e:
-            print(f"   ⚠️  Error dropping {table}: {e}")
+            print(f"   [WARNING]  Error dropping {table}: {e}")
     
     # Also drop the function
     try:
         db.execute("DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE")
-        print(f"   ✅ Dropped update_updated_at_column function")
+        print(f"   [OK] Dropped update_updated_at_column function")
     except Exception as e:
-        print(f"   ⚠️  Error dropping function: {e}")
+        print(f"   [WARNING]  Error dropping function: {e}")
 
 
 def create_test_data(db_models: Database):
@@ -66,7 +66,7 @@ def create_test_data(db_models: Database):
             years_until_retirement=validated['years_until_retirement'],
             target_retirement_income=validated['target_retirement_income']
         )
-        print("   ✅ Created test user")
+        print("   [OK] Created test user")
     
     # Create test accounts with Pydantic validation
     accounts = [
@@ -107,7 +107,7 @@ def create_test_data(db_models: Database):
                 cash_interest=validated['cash_interest']
             )
             account_ids.append(acc_id)
-            print(f"   ✅ Created account: {validated['account_name']}")
+            print(f"   [OK] Created account: {validated['account_name']}")
     
     # Create test positions in first account (401k)
     if account_ids:
@@ -138,7 +138,7 @@ def create_test_data(db_models: Database):
                     validated['symbol'],
                     validated['quantity']
                 )
-                print(f"   ✅ Added position: {quantity} shares of {symbol}")
+                print(f"   [OK] Added position: {quantity} shares of {symbol}")
 
 
 def main():
@@ -149,7 +149,7 @@ def main():
                        help='Skip dropping tables (just reload data)')
     args = parser.parse_args()
     
-    print("🚀 Database Reset Script")
+    print("[LAUNCH] Database Reset Script")
     print("=" * 50)
     
     # Initialize database
@@ -167,11 +167,11 @@ def main():
                               capture_output=True, text=True)
         
         if result.returncode != 0:
-            print("❌ Migration failed!")
+            print("[ERROR] Migration failed!")
             print(result.stderr)
             sys.exit(1)
         else:
-            print("✅ Migrations completed")
+            print("[OK] Migrations completed")
     
     # Load seed data
     print("\n🌱 Loading seed data...")
@@ -180,22 +180,22 @@ def main():
                           capture_output=True, text=True)
     
     if result.returncode != 0:
-        print("❌ Seed data failed!")
+        print("[ERROR] Seed data failed!")
         print(result.stderr)
         sys.exit(1)
     else:
         # Extract instrument count from output
         if '22/22 instruments loaded' in result.stdout:
-            print("✅ Loaded 22 instruments")
+            print("[OK] Loaded 22 instruments")
         else:
-            print("✅ Seed data loaded")
+            print("[OK] Seed data loaded")
     
     # Create test data if requested
     if args.with_test_data:
         create_test_data(db_models)
     
     # Final verification
-    print("\n🔍 Final verification...")
+    print("\n[CHECK] Final verification...")
     
     # Count records
     tables = ['users', 'instruments', 'accounts', 'positions', 'jobs']
@@ -205,7 +205,7 @@ def main():
         print(f"   • {table}: {count} records")
     
     print("\n" + "=" * 50)
-    print("✅ Database reset complete!")
+    print("[OK] Database reset complete!")
     
     if args.with_test_data:
         print("\n📝 Test user created:")

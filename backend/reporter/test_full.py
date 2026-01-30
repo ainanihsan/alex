@@ -49,10 +49,10 @@ def test_reporter_lambda():
         job = db.jobs.find_by_id(job_id)
         
         if job and job.get('report_payload'):
-            print("\n✅ Report generated successfully!")
+            print("\n[OK] Report generated successfully!")
             print(f"Report preview: {job['report_payload'][:500]}...")
         else:
-            print("\n❌ No report found in database")
+            print("\n[ERROR] No report found in database")
             
     except Exception as e:
         print(f"Error invoking Lambda: {e}")

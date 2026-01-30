@@ -37,10 +37,10 @@ async def test_local():
         print("=" * 60)
         print(result.final_output)
         print("=" * 60)
-        print("\n✅ Test completed successfully!")
+        print("\n[OK] Test completed successfully!")
 
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n[ERROR] Error: {e}")
         import traceback
 
         traceback.print_exc()

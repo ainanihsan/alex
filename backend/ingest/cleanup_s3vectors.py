@@ -88,12 +88,12 @@ def delete_all_vectors():
                 break
         
         if deleted_count > 0:
-            print(f"\n✅ Successfully deleted {deleted_count} vectors")
+            print(f"\n[OK] Successfully deleted {deleted_count} vectors")
         else:
-            print("✅ No vectors found - database is already empty")
+            print("[OK] No vectors found - database is already empty")
             
     except Exception as e:
-        print(f"❌ Error during cleanup: {e}")
+        print(f"[ERROR] Error during cleanup: {e}")
         if deleted_count > 0:
             print(f"   (Partially successful - deleted {deleted_count} vectors)")
 
@@ -105,7 +105,7 @@ def main():
     print()
     
     # Confirm before deleting
-    response = input("⚠️  This will DELETE ALL vectors. Continue? (yes/no): ")
+    response = input("[WARNING]  This will DELETE ALL vectors. Continue? (yes/no): ")
     if response.lower() != 'yes':
         print("Cleanup cancelled.")
         return

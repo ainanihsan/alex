@@ -67,7 +67,7 @@ def setup_test_data(db):
 
 def main():
     print("=" * 70)
-    print("🎯 Full End-to-End Test via SQS")
+    print("[TARGET] Full End-to-End Test via SQS")
     print("=" * 70)
     
     db = Database()
@@ -105,7 +105,7 @@ def main():
             break
     
     if not queue_url:
-        print(f"  ❌ Queue {QUEUE_NAME} not found")
+        print(f"  [ERROR] Queue {QUEUE_NAME} not found")
         return 1
     
     print(f"  ✓ Found queue: {QUEUE_NAME}")
@@ -140,8 +140,8 @@ def main():
         
         if status == 'completed':
             print("-" * 50)
-            print("\n✅ Job completed successfully!")
-            print("\n📊 Analysis Results:")
+            print("\n[OK] Job completed successfully!")
+            print("\n[DATA] Analysis Results:")
             
             # Report
             if job.get('report_payload'):
@@ -150,12 +150,12 @@ def main():
                 print(f"   - Length: {len(report_content)} characters")
                 print(f"   - Preview: {report_content[:200]}...")
             else:
-                print("\n❌ No report found")
+                print("\n[ERROR] No report found")
             
             # Charts
             if job.get('charts_payload'):
                 charts = job['charts_payload']
-                print(f"\n📊 Charts Created: {len(charts)} visualizations")
+                print(f"\n[DATA] Charts Created: {len(charts)} visualizations")
                 for chart_key, chart_data in charts.items():
                     if isinstance(chart_data, dict):
                         title = chart_data.get('title', 'Untitled')
@@ -163,12 +163,12 @@ def main():
                         data_points = len(chart_data.get('data', []))
                         print(f"   - {chart_key}: {title} ({chart_type}, {data_points} data points)")
             else:
-                print("\n❌ No charts found")
+                print("\n[ERROR] No charts found")
             
             # Retirement
             if job.get('retirement_payload'):
                 retirement = job['retirement_payload']
-                print(f"\n🎯 Retirement Analysis:")
+                print(f"\n[TARGET] Retirement Analysis:")
                 if isinstance(retirement, dict):
                     if 'success_rate' in retirement:
                         print(f"   - Success Rate: {retirement['success_rate']}%")
@@ -177,7 +177,7 @@ def main():
                     if 'analysis' in retirement:
                         print(f"   - Analysis Length: {len(retirement['analysis'])} characters")
             else:
-                print("\n❌ No retirement analysis found")
+                print("\n[ERROR] No retirement analysis found")
             
             # Summary
             if job.get('summary_payload'):
@@ -191,7 +191,7 @@ def main():
             break
         elif status == 'failed':
             print("-" * 50)
-            print(f"\n❌ Job failed")
+            print(f"\n[ERROR] Job failed")
             if job.get('error_message'):
                 print(f"Error details: {job['error_message']}")
             break
@@ -199,7 +199,7 @@ def main():
         time.sleep(2)
     else:
         print("-" * 50)
-        print("\n❌ Job timed out after 3 minutes")
+        print("\n[ERROR] Job timed out after 3 minutes")
         print(f"Final status: {job['status']}")
         return 1
     

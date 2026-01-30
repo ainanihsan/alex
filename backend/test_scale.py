@@ -147,14 +147,14 @@ async def run_scale_test():
     all_users = []
     
     # Create all test users
-    print("\n📊 Creating test users...")
+    print("\n[DATA] Creating test users...")
     for config in test_configs:
         user_data = await create_test_user(**config)
         all_users.append(user_data)
         print(f"  User {config['user_num']}: {user_data['num_accounts']} accounts, {user_data['num_positions']} positions")
     
     # Send all jobs to SQS concurrently
-    print("\n🚀 Sending jobs to SQS...")
+    print("\n[LAUNCH] Sending jobs to SQS...")
     send_tasks = []
     for user in all_users:
         msg_id = await send_job_to_sqs(user['job_id'])
@@ -184,10 +184,10 @@ async def run_scale_test():
         if status == 'completed':
             successful += 1
             total_time += result['elapsed']
-            print(f"✅ User {user['user_num']}: Completed in {result['elapsed']}s")
+            print(f"[OK] User {user['user_num']}: Completed in {result['elapsed']}s")
         elif status == 'failed':
             failed += 1
-            print(f"❌ User {user['user_num']}: Failed - {result.get('error', 'Unknown')}")
+            print(f"[ERROR] User {user['user_num']}: Failed - {result.get('error', 'Unknown')}")
         else:
             timed_out += 1
             print(f"⏱️ User {user['user_num']}: Timed out")
@@ -204,7 +204,7 @@ async def run_scale_test():
         print(f"Average completion time: {total_time/successful:.1f}s")
     
     # Verify job details
-    print("\n📊 Detailed Results:")
+    print("\n[DATA] Detailed Results:")
     db = Database()
     for user in all_users:
         job = db.jobs.find_by_id(user['job_id'])
@@ -255,10 +255,10 @@ async def run_scale_test():
     
     # Final result
     if successful == len(all_users):
-        print("\n✅ PHASE 6.6 TEST PASSED: All users processed successfully")
+        print("\n[OK] PHASE 6.6 TEST PASSED: All users processed successfully")
         return True
     else:
-        print(f"\n❌ PHASE 6.6 TEST FAILED: {failed + timed_out} users did not complete")
+        print(f"\n[ERROR] PHASE 6.6 TEST FAILED: {failed + timed_out} users did not complete")
         return False
 
 async def main():
@@ -267,7 +267,7 @@ async def main():
         success = await run_scale_test()
         exit(0 if success else 1)
     except Exception as e:
-        print(f"\n❌ ERROR during test: {e}")
+        print(f"\n[ERROR] ERROR during test: {e}")
         import traceback
         traceback.print_exc()
         exit(1)

@@ -23,7 +23,7 @@ def get_service_url():
         
         service_arns = json.loads(result.stdout)
         if not service_arns:
-            print("❌ App Runner service 'alex-researcher' not found.")
+            print("[ERROR] App Runner service 'alex-researcher' not found.")
             print("   Have you deployed it yet? Run: python deploy.py")
             sys.exit(1)
         
@@ -39,11 +39,11 @@ def get_service_url():
         
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
-        print(f"❌ Error getting service URL: {e}")
+        print(f"[ERROR] Error getting service URL: {e}")
         print("   Make sure AWS CLI is configured and you have the right permissions.")
         sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"❌ Error parsing AWS response: {e}")
+        print(f"[ERROR] Error parsing AWS response: {e}")
         sys.exit(1)
 
 
@@ -57,10 +57,10 @@ def test_research(topic=None):
     service_url = get_service_url()
     
     if not service_url:
-        print("❌ Could not get service URL")
+        print("[ERROR] Could not get service URL")
         sys.exit(1)
     
-    print(f"✅ Found service at: https://{service_url}")
+    print(f"[OK] Found service at: https://{service_url}")
     
     # Test health endpoint first
     print("\nChecking service health...")
@@ -68,9 +68,9 @@ def test_research(topic=None):
         health_url = f"https://{service_url}/health"
         response = requests.get(health_url, timeout=10)
         response.raise_for_status()
-        print("✅ Service is healthy")
+        print("[OK] Service is healthy")
     except requests.exceptions.RequestException as e:
-        print(f"❌ Health check failed: {e}")
+        print(f"[ERROR] Health check failed: {e}")
         print("   The service may still be starting. Try again in a minute.")
         sys.exit(1)
     
@@ -92,24 +92,24 @@ def test_research(topic=None):
         # Parse and display the result
         result = response.json()
         
-        print("\n✅ Research generated successfully!")
+        print("\n[OK] Research generated successfully!")
         print("\n" + "="*60)
         print("RESEARCH RESULT:")
         print("="*60)
         print(result)
         print("="*60)
         
-        print("\n✅ The research has been automatically stored in your knowledge base.")
+        print("\n[OK] The research has been automatically stored in your knowledge base.")
         print("   To verify, run:")
         print("     cd ../ingest")
         print("     uv run test_search_s3vectors.py")
         
     except requests.exceptions.Timeout:
-        print("❌ Request timed out. The service might be under heavy load.")
+        print("[ERROR] Request timed out. The service might be under heavy load.")
         print("   Try again in a moment.")
         sys.exit(1)
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error calling research endpoint: {e}")
+        print(f"[ERROR] Error calling research endpoint: {e}")
         if hasattr(e, 'response') and e.response is not None:
             try:
                 error_detail = e.response.json()

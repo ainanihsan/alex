@@ -82,10 +82,10 @@ def test_charter_lambda():
         job = db.jobs.find_by_id(job_id)
 
         if job and job.get("charts_payload"):
-            print(f"\n📊 Charts Created ({len(job['charts_payload'])} total):")
+            print(f"\n[DATA] Charts Created ({len(job['charts_payload'])} total):")
             print("=" * 50)
             for chart_key, chart_data in job["charts_payload"].items():
-                print(f"\n🎯 Chart: {chart_key}")
+                print(f"\n[TARGET] Chart: {chart_key}")
                 print(f"   Title: {chart_data.get('title', 'N/A')}")
                 print(f"   Type: {chart_data.get('type', 'N/A')}")
                 print(f"   Description: {chart_data.get('description', 'N/A')}")
@@ -99,7 +99,7 @@ def test_charter_lambda():
                     print(f"     {i+1}. {name}: ${value:,.2f} {color}")
 
         else:
-            print("\n❌ No charts found in database")
+            print("\n[ERROR] No charts found in database")
 
     except Exception as e:
         print(f"Error invoking Lambda: {e}")

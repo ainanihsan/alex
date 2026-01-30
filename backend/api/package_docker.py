@@ -153,7 +153,7 @@ CMD ["api.main.handler"]
 
         # Get file size
         size_mb = zip_path.stat().st_size / (1024 * 1024)
-        print(f"✅ Lambda package created: {zip_path} ({size_mb:.2f} MB)")
+        print(f"[OK] Lambda package created: {zip_path} ({size_mb:.2f} MB)")
 
         # Verify the package
         print("\nPackage contents (first 20 files):")

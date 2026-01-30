@@ -67,7 +67,7 @@ async def run_research_agent(topic: str = None) -> str:
 
                 result = await Runner.run(agent, input=query, max_turns=15)
         except Exception as e:
-            print(f"⚠️  Playwright MCP failed to initialize: {e}")
+            print(f"[WARNING]  Playwright MCP failed to initialize: {e}")
             print(f"   Error type: {type(e).__name__}")
             import traceback
             print("   Full traceback:")

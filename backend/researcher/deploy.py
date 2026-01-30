@@ -121,7 +121,7 @@ def main():
     run_command(["docker", "push", f"{ecr_url}:{image_tag}"])
     run_command(["docker", "push", f"{ecr_url}:latest"])
 
-    print("\n✅ Docker image pushed successfully!")
+    print("\n[OK] Docker image pushed successfully!")
     print(
         "\nNext step: Run 'terraform apply' in terraform/4_researcher to create the App Runner service."
     )
@@ -204,7 +204,7 @@ def main():
                     ],
                     capture_output=True,
                 )
-                print("✅ Service updated with new image!")
+                print("[OK] Service updated with new image!")
 
                 # Wait for deployment to complete
                 print("\nWaiting for deployment to complete (this may take 5-10 minutes)...")
@@ -235,7 +235,7 @@ def main():
                     status = status.strip()
 
                     if status == "RUNNING":
-                        print("\n✅ Deployment complete! Service is running.")
+                        print("\n[OK] Deployment complete! Service is running.")
 
                         # Get and display the service URL
                         service_url = run_command(
@@ -255,7 +255,7 @@ def main():
                             capture_output=True,
                         )
 
-                        print(f"\n🚀 Your service is available at:")
+                        print(f"\n[LAUNCH] Your service is available at:")
                         print(f"   https://{service_url}")
                         print(f"\nTest it with:")
                         print(f"   curl https://{service_url}/health")
@@ -285,7 +285,7 @@ def main():
                             time.sleep(2)
                             continue
                         elif operation_status == "FAILED":
-                            print(f"\n❌ Deployment failed!")
+                            print(f"\n[ERROR] Deployment failed!")
                             print("Check the AWS Console for error details.")
                             break
                         else:
@@ -299,11 +299,11 @@ def main():
                             time.sleep(5)
                             attempts += 1
                     else:
-                        print(f"\n⚠️ Unexpected status: {status}")
+                        print(f"\n[WARNING] Unexpected status: {status}")
                         print("Check the AWS Console for more details.")
                         break
                 else:
-                    print("\n⚠️ Deployment is taking longer than expected.")
+                    print("\n[WARNING] Deployment is taking longer than expected.")
                     print("Check the status in the AWS Console.")
             else:
                 print(

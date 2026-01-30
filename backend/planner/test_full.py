@@ -49,7 +49,7 @@ def get_queue_url():
 def main():
     """Run the full test."""
     print("=" * 70)
-    print("🎯 Alex Agent Orchestration - Full Test")
+    print("[TARGET] Alex Agent Orchestration - Full Test")
     print("=" * 70)
     
     # Display AWS info
@@ -62,12 +62,12 @@ def main():
     print()
     
     # Check for test user
-    print("📊 Checking test data...")
+    print("[DATA] Checking test data...")
     test_user_id = 'test_user_001'
     user = db.users.find_by_clerk_id(test_user_id)
     
     if not user:
-        print("❌ Test user not found. Please run database setup first:")
+        print("[ERROR] Test user not found. Please run database setup first:")
         print("   cd ../database && uv run reset_db.py --with-test-data")
         return 1
     
@@ -83,7 +83,7 @@ def main():
     print(f"✓ Portfolio: {len(accounts)} accounts, {total_positions} positions")
     
     # Create test job
-    print("\n🚀 Creating test job...")
+    print("\n[LAUNCH] Creating test job...")
     job_data = {
         'clerk_user_id': test_user_id,
         'job_type': 'portfolio_analysis',
@@ -108,7 +108,7 @@ def main():
         )
         print(f"✓ Message sent: {response['MessageId']}")
     except Exception as e:
-        print(f"❌ Failed to send to SQS: {e}")
+        print(f"[ERROR] Failed to send to SQS: {e}")
         return 1
     
     # Monitor job
@@ -130,17 +130,17 @@ def main():
         
         if status == 'completed':
             print("-" * 50)
-            print("✅ Job completed successfully!")
+            print("[OK] Job completed successfully!")
             break
         elif status == 'failed':
             print("-" * 50)
-            print(f"❌ Job failed: {job.get('error_message', 'Unknown error')}")
+            print(f"[ERROR] Job failed: {job.get('error_message', 'Unknown error')}")
             return 1
         
         time.sleep(2)
     else:
         print("-" * 50)
-        print("❌ Job timed out after 3 minutes")
+        print("[ERROR] Job timed out after 3 minutes")
         return 1
     
     # Display results
@@ -150,7 +150,7 @@ def main():
     
     # Orchestrator summary
     if job.get('summary_payload'):
-        print("\n🎯 Orchestrator Summary:")
+        print("\n[TARGET] Orchestrator Summary:")
         summary = job['summary_payload']
         print(f"Summary: {summary.get('summary', 'N/A')}")
         
@@ -178,7 +178,7 @@ def main():
     
     # Charts
     if job.get('charts_payload'):
-        print(f"\n📊 Visualizations: {len(job['charts_payload'])} charts")
+        print(f"\n[DATA] Visualizations: {len(job['charts_payload'])} charts")
         for chart_key, chart_data in job['charts_payload'].items():
             print(f"  • {chart_key}: {chart_data.get('title', 'Untitled')}")
             if chart_data.get('data'):
@@ -186,14 +186,14 @@ def main():
     
     # Retirement projections
     if job.get('retirement_payload'):
-        print("\n🎯 Retirement Analysis:")
+        print("\n[TARGET] Retirement Analysis:")
         ret = job['retirement_payload']
         print(f"  Success Rate: {ret.get('success_rate', 'N/A')}%")
         print(f"  Projected Value: ${ret.get('projected_value', 0):,.0f}")
         print(f"  Years to Retirement: {ret.get('years_to_retirement', 'N/A')}")
     
     print("\n" + "=" * 70)
-    print("✅ Full test completed successfully!")
+    print("[OK] Full test completed successfully!")
     print("=" * 70)
     
     return 0

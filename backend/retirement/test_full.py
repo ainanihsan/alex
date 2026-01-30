@@ -49,10 +49,10 @@ def test_retirement_lambda():
         job = db.jobs.find_by_id(job_id)
         
         if job and job.get('retirement_payload'):
-            print("\n✅ Retirement analysis generated successfully!")
+            print("\n[OK] Retirement analysis generated successfully!")
             print(f"Analysis preview: {json.dumps(job['retirement_payload'], indent=2)[:500]}...")
         else:
-            print("\n❌ No retirement analysis found in database")
+            print("\n[ERROR] No retirement analysis found in database")
             
     except Exception as e:
         print(f"Error invoking Lambda: {e}")

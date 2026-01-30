@@ -25,7 +25,7 @@ class TaggerTest:
 
     def package_tagger(self):
         """Package the tagger Lambda using Docker"""
-        print("\n📦 Packaging Tagger Lambda...")
+        print("\n[PACKAGE] Packaging Tagger Lambda...")
         print("=" * 60)
 
         try:
@@ -38,26 +38,26 @@ class TaggerTest:
             )
 
             if result.returncode != 0:
-                print(f"❌ Packaging failed: {result.stderr}")
+                print(f"[ERROR] Packaging failed: {result.stderr}")
                 return False
 
             # Check if zip file was created
             zip_path = Path(__file__).parent / 'tagger_lambda.zip'
             if zip_path.exists():
                 size_mb = zip_path.stat().st_size / (1024 * 1024)
-                print(f"✅ Package created: {zip_path} ({size_mb:.1f} MB)")
+                print(f"[OK] Package created: {zip_path} ({size_mb:.1f} MB)")
                 return True
             else:
-                print("❌ Package file not found")
+                print("[ERROR] Package file not found")
                 return False
 
         except Exception as e:
-            print(f"❌ Error packaging: {e}")
+            print(f"[ERROR] Error packaging: {e}")
             return False
 
     def deploy_tagger(self):
         """Deploy the tagger Lambda to AWS"""
-        print("\n🚀 Deploying Tagger Lambda...")
+        print("\n[LAUNCH] Deploying Tagger Lambda...")
         print("=" * 60)
 
         try:
@@ -75,7 +75,7 @@ class TaggerTest:
             with open(zip_path, 'rb') as f:
                 s3_client.upload_fileobj(f, bucket_name, key)
 
-            print(f"✅ Uploaded to S3: s3://{bucket_name}/{key}")
+            print(f"[OK] Uploaded to S3: s3://{bucket_name}/{key}")
 
             # Update Lambda function code from S3
             print("Updating Lambda function from S3...")
@@ -90,18 +90,18 @@ class TaggerTest:
             waiter = self.lambda_client.get_waiter('function_updated')
             waiter.wait(FunctionName='alex-tagger')
 
-            print(f"✅ Lambda deployed successfully")
+            print(f"[OK] Lambda deployed successfully")
             print(f"   Last modified: {response['LastModified']}")
             print(f"   Code size: {response['CodeSize'] / (1024*1024):.1f} MB")
             return True
 
         except Exception as e:
-            print(f"❌ Error deploying: {e}")
+            print(f"[ERROR] Error deploying: {e}")
             return False
 
     def test_tagger(self):
         """Test the deployed tagger Lambda"""
-        print("\n🧪 Testing Tagger Lambda...")
+        print("\n[TEST] Testing Tagger Lambda...")
         print("=" * 60)
 
         # Test instruments - mix of ETFs and stocks
@@ -133,7 +133,7 @@ class TaggerTest:
             result = json.loads(response['Payload'].read())
 
             if response['StatusCode'] == 200:
-                print(f"✅ Lambda executed successfully in {elapsed:.1f} seconds")
+                print(f"[OK] Lambda executed successfully in {elapsed:.1f} seconds")
 
                 # Parse the body if it's a string
                 if isinstance(result.get('body'), str):
@@ -141,7 +141,7 @@ class TaggerTest:
                 else:
                     body = result.get('body', result)
 
-                print(f"\n📊 Results:")
+                print(f"\n[DATA] Results:")
                 print(f"  Tagged: {body.get('tagged', 0)} instruments")
                 print(f"  Updated: {body.get('updated', [])}")
                 if body.get('errors'):
@@ -157,37 +157,37 @@ class TaggerTest:
                         print(f"    Sectors: {cls.get('sectors', {})}")
 
                 # Verify in database
-                print(f"\n🔍 Verifying in database:")
+                print(f"\n[CHECK] Verifying in database:")
                 for inst in test_instruments:
                     db_inst = self.db.instruments.find_by_symbol(inst['symbol'])
                     if db_inst and db_inst.get('allocation_asset_class'):
-                        print(f"  ✅ {inst['symbol']}: Has allocations in database")
+                        print(f"  [OK] {inst['symbol']}: Has allocations in database")
                     else:
-                        print(f"  ⚠️  {inst['symbol']}: No allocations in database")
+                        print(f"  [WARNING]  {inst['symbol']}: No allocations in database")
 
             else:
-                print(f"❌ Lambda failed with status {response['StatusCode']}")
+                print(f"[ERROR] Lambda failed with status {response['StatusCode']}")
                 print(f"   Response: {result}")
 
         except Exception as e:
-            print(f"❌ Error testing Lambda: {e}")
+            print(f"[ERROR] Error testing Lambda: {e}")
             import traceback
             traceback.print_exc()
 
     def run_all(self):
         """Run the complete test: package, deploy, and test"""
         print("\n" + "=" * 60)
-        print("🎯 Complete Tagger Test: Package, Deploy, and Test")
+        print("[TARGET] Complete Tagger Test: Package, Deploy, and Test")
         print("=" * 60)
 
         # Step 1: Package
         if not self.package_tagger():
-            print("\n❌ Packaging failed, stopping test")
+            print("\n[ERROR] Packaging failed, stopping test")
             return False
 
         # Step 2: Deploy
         if not self.deploy_tagger():
-            print("\n❌ Deployment failed, stopping test")
+            print("\n[ERROR] Deployment failed, stopping test")
             return False
 
         # Give Lambda a moment to stabilize after deployment
@@ -198,7 +198,7 @@ class TaggerTest:
         self.test_tagger()
 
         print("\n" + "=" * 60)
-        print("✅ Complete test finished!")
+        print("[OK] Complete test finished!")
         print("=" * 60)
 
         # Reminder about Langfuse
