@@ -2,15 +2,37 @@ FROM --platform=linux/amd64 python:3.12-slim
 
 WORKDIR /app
 
-# Install Node.js
+# Install Node.js and system dependencies for Chromium
 RUN apt-get update && apt-get install -y \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
+    && apt-get install -y \
+    nodejs \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpango-1.0-0 \
+    libcairo2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Playwright dependencies (system-level dependencies for Chromium)
-RUN npx -y playwright install --with-deps chromium
+# Install Playwright and its browsers globally
+# Install the MCP server package which will use these browsers
+RUN npm install -g @playwright/mcp
+RUN npx -y playwright install chromium
+
+# Set environment variables for Playwright
+ENV PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0
 
 # Install Python package manager
 RUN pip install uv
