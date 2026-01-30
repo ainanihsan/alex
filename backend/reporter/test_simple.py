@@ -73,7 +73,7 @@ def test_reporter():
         job = db.jobs.find_by_id(job_id)
         if job and job.get('report_payload'):
             payload = job['report_payload']
-            print(f"✅ Report data found in database")
+            print(f"[OK] Report data found in database")
             print(f"Payload keys: {list(payload.keys())}")
             
             if 'content' in payload:
@@ -98,9 +98,9 @@ def test_reporter():
                     contains_reasoning = any(indicator.lower() in content.lower() for indicator in reasoning_indicators)
                     
                     if contains_reasoning:
-                        print("⚠️  WARNING: Report may contain reasoning/thinking text")
+                        print("[WARNING] Report may contain reasoning/thinking text")
                     else:
-                        print("✅ Report appears to be final output only (no reasoning detected)")
+                        print("[OK] Report appears to be final output only (no reasoning detected)")
                     
                     # Show first 500 characters and last 200 characters
                     print(f"\nFirst 500 characters:")
@@ -120,7 +120,7 @@ def test_reporter():
             print(f"\nGenerated at: {payload.get('generated_at', 'N/A')}")
             print(f"Agent: {payload.get('agent', 'N/A')}")
         else:
-            print("❌ No report data found in database")
+            print(f"\n[ERROR] No report found in database")
     else:
         print(f"Error: {result['body']}")
     
