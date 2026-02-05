@@ -27,6 +27,11 @@ logger = logging.getLogger(__name__)
 BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "us.anthropic.claude-3-7-sonnet-20250219-v1:0")
 BEDROCK_REGION = os.getenv("BEDROCK_REGION", "us-west-2")
 
+# Ensure Bedrock region is set for LiteLLM/AWS SDK early
+os.environ.setdefault("AWS_REGION_NAME", BEDROCK_REGION)
+os.environ.setdefault("AWS_REGION", BEDROCK_REGION)
+os.environ.setdefault("AWS_DEFAULT_REGION", BEDROCK_REGION)
+
 
 class AllocationBreakdown(BaseModel):
     """Allocation percentages that must sum to 100"""
@@ -177,6 +182,8 @@ async def classify_instrument(
         # Set region for LiteLLM Bedrock calls
         bedrock_region = os.getenv("BEDROCK_REGION", "us-west-2")
         os.environ["AWS_REGION_NAME"] = bedrock_region
+        os.environ["AWS_REGION"] = bedrock_region
+        os.environ["AWS_DEFAULT_REGION"] = bedrock_region
 
         model = LitellmModel(model=f"bedrock/{model_id}")
 

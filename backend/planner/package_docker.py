@@ -10,6 +10,7 @@ import shutil
 import tempfile
 import subprocess
 import argparse
+import zipfile
 from pathlib import Path
 
 def run_command(cmd, cwd=None):
@@ -87,12 +88,14 @@ def package_lambda():
         if zip_path.exists():
             zip_path.unlink()
         
-        # Create new zip
+        # Create new zip using Python's zipfile module (cross-platform)
         print(f"Creating zip file: {zip_path}")
-        run_command(
-            ["zip", "-r", str(zip_path), "."],
-            cwd=str(package_dir)
-        )
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(package_dir):
+                for file in files:
+                    file_path = Path(root) / file
+                    arcname = file_path.relative_to(package_dir)
+                    zipf.write(file_path, arcname)
         
         # Get file size
         size_mb = zip_path.stat().st_size / (1024 * 1024)
